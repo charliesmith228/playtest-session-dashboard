@@ -1,0 +1,30 @@
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# PHP dependencies - reinstalled via composer install
+vendor/
+
+# React dependencies - reinstalled via npm install
+node_modules/
+
+# React build output - generated via npm run build
+frontend/dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor config
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# PHP logs and cache
+*.log
+/storage/logs/
+
+# Docker override file
+docker-compose.override.yml

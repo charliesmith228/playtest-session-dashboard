@@ -1,0 +1,66 @@
+services:
+
+  # --- NGINX: web server ---
+  nginx:
+    image: nginx:alpine          # Use the official Nginx image, no custom Dockerfile needed
+    ports:
+      - "8080:80"                # Map port 8080 on your machine to port 80 inside the container
+    volumes:
+      # Mount your Nginx config into the container
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+      # Mount your PHP api code so Nginx can reference the file paths
+      - ./api:/var/www/api:ro
+
+      # Mount the React build output so Nginx can serve the static files
+      - ./ui/dist:/var/www/ui:ro
+    depends_on:
+      - php-fpm                  # Don't start Nginx until PHP-FPM is running
+
+  # --- PHP-FPM: api ---
+  php-fpm:
+    build:
+      context: .                 # Build context is the project root
+      dockerfile: docker/php/Dockerfile  # Use our custom Dockerfile
+    volumes:
+      # Mount your api code so changes are reflected without rebuilding
+      - ./api:/var/www/api
+    environment:
+      # These become environment variables inside the PHP container
+      # PHP can read these with $_ENV['DB_HOST'] or getenv('DB_HOST')
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - postgres
+
+  # --- PostgreSQL: database ---
+  postgres:
+    image: postgres:16-alpine    # Official Postgres image
+    ports:
+      - "54320:5432"                # Map port 54320 on your machine to port 5432 inside the container
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      # Named volume - data persists even if the container is stopped/deleted
+      - postgres_data:/var/lib/postgresql/data
+
+# --- Redis: caching ---
+  redis:
+    image: redis:7-alpine
+    # No ports exposed to the host - only other containers need to reach it
+    volumes:
+      # Persist Redis data across container restarts
+      - redis_data:/data
+
+# Define the named volume used by Postgres
+volumes:
+  postgres_data:
+  redis_data:

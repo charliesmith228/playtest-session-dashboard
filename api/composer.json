@@ -1,0 +1,20 @@
+{
+    "name": "charliesmith228/playtest-session-dashboard-api",
+    "description": "The API backend for my local playtest session dashboard side project.",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/",
+            "App\\Migrator\\": "migrator/"
+        }
+    },
+    "authors": [
+        {
+            "name": "charliesmith228",
+            "email": "charliesmith228@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "firebase/php-jwt": "^7.1"
+    }
+}
