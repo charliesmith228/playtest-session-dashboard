@@ -6,6 +6,7 @@ namespace App;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 
 class Database
 {
@@ -40,28 +41,40 @@ class Database
         catch (PDOException $e)
         {
             // Don't expose the real error to the client - log it instead
-            error_log('Database connection failed: ' . $e->getMessage());
+            error_log("Database connection failed: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Database connection failed']);
+            echo json_encode(["error" => "Database connection failed"]);
             die;
         }
+    }
+
+    private function executeQuery(string $sql, array $params): PDOStatement
+    {
+        $pdoQuery = $this->connection->prepare($sql);
+        $pdoQuery->execute($params);
+        return $pdoQuery;
     }
 
     // Run a SELECT query and return all matching rows
     public function query(string $sql, array $params = []): array
     {
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        $pdoQuery = $this->executeQuery($sql, $params);
+        return $pdoQuery->fetchAll();
+    }
+
+    // Run a SELECT query and return all matching rows
+    public function queryOne(string $sql, array $params = []): mixed
+    {
+        $pdoQuery = $this->executeQuery($sql, $params);
+        return $pdoQuery->fetch();
     }
 
     // Run an INSERT, UPDATE, or DELETE query
     // Returns the number of affected rows
     public function execute(string $sql, array $params = []): int
     {
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->rowCount();
+        $pdoQuery = $this->executeQuery($sql, $params);
+        return $pdoQuery->rowCount();
     }
 
     // Get the ID of the last inserted row (useful after an INSERT)

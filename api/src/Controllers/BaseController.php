@@ -16,7 +16,7 @@ abstract class BaseController
         protected Cache $cache
     ){
         // Set the Content-Type header once for all API responses
-        header('Content-Type: application/json');
+        header("Content-Type: application/json");
     }
 
     // Convenience method so controllers can write $this->respond([...])
@@ -30,16 +30,16 @@ abstract class BaseController
     // is wrong - the router catches the exception and sends the error response
     protected function getJsonBody(array $requiredFields = []): array
     {
-        $raw = file_get_contents('php://input');
+        $raw = file_get_contents("php://input");
 
         if (empty($raw)) {
-            throw new HttpException('Request body is required', 400);
+            throw new HttpException("Request body is required", 400);
         }
 
         $decoded = json_decode($raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new HttpException('Invalid JSON body', 400);
+            throw new HttpException("Invalid JSON body", 400);
         }
 
         foreach ($requiredFields as $field) {

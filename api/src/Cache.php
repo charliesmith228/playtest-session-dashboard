@@ -20,7 +20,7 @@ class Cache
         }
         catch (RedisException $e)
         {
-            error_log('Redis connection failed: ' . $e->getMessage());
+            error_log("Redis connection failed: " . $e->getMessage());
             // If Redis is unavailable, continue without caching
         }
     }

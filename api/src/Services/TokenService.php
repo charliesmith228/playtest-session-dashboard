@@ -13,7 +13,7 @@ use App\Exceptions\HttpException;
 class TokenService
 {
     // The algorithm used to sign the token
-    private const ALGORITHM = 'HS256';
+    private const ALGORITHM = "HS256";
 
     // How long tokens are valid for in seconds (1 hour)
     private const TTL = 3600;
@@ -27,14 +27,14 @@ class TokenService
 
         $claims = [
             // Issued at - when the token was created
-            'iat' => $now,
+            "iat" => $now,
 
             // Expiry - when the token stops being valid
             // The JWT library checks this automatically on decode
-            'exp' => $now + self::TTL,
+            "exp" => $now + self::TTL,
 
             // Custom claim - the user this token belongs to
-            'sub' => $userId,
+            "sub" => $userId,
         ];
 
         return JWT::encode($claims, $this->secret, self::ALGORITHM);
@@ -50,11 +50,11 @@ class TokenService
             return (int) $decoded->sub;
 
         } catch (ExpiredException) {
-            throw new HttpException('Token has expired', 401);
+            throw new HttpException("Token has expired", 401);
         } catch (SignatureInvalidException) {
-            throw new HttpException('Token signature is invalid', 401);
+            throw new HttpException("Token signature is invalid", 401);
         } catch (\Throwable) {
-            throw new HttpException('Invalid token', 401);
+            throw new HttpException("Invalid token", 401);
         }
     }
 }

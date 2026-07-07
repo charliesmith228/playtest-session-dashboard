@@ -32,7 +32,7 @@ class Router
         bool $protected = false
     ): void
     {
-        $this->addRoute('GET', $pattern, $handler, $protected);
+        $this->addRoute("GET", $pattern, $handler, $protected);
     }
 
     // Register a POST route
@@ -42,7 +42,17 @@ class Router
         bool $protected = false
     ): void
     {
-        $this->addRoute('POST', $pattern, $handler, $protected);
+        $this->addRoute("POST", $pattern, $handler, $protected);
+    }
+
+    // Register a PUT route
+    public function put(
+        string $pattern,
+        array $handler,
+        bool $protected = false
+    ): void
+    {
+        $this->addRoute("PUT", $pattern, $handler, $protected);
     }
 
     // Register a DELETE route
@@ -52,7 +62,7 @@ class Router
         bool $protected = false
     ): void
     {
-        $this->addRoute('DELETE', $pattern, $handler, $protected);
+        $this->addRoute("DELETE", $pattern, $handler, $protected);
     }
 
     private function addRoute(
@@ -63,10 +73,10 @@ class Router
     ): void
     {
         $this->routes[] = [
-            'method'  => $method,
-            'pattern' => $pattern,
-            'handler' => $handler,
-            'protected' => $protected
+            "method"  => $method,
+            "pattern" => $pattern,
+            "handler" => $handler,
+            "protected" => $protected
         ];
     }
 
@@ -76,14 +86,14 @@ class Router
         foreach ($this->routes as $route)
         {
             // Skip if the HTTP method doesn't match (e.g. GET vs POST)
-            if ($route['method'] !== $this->method) {
+            if ($route["method"] !== $this->method) {
                 continue;
             }
 
             // Convert the route pattern into a regex
             // e.g. /api/users/{id} becomes /api/users/([^/]+)
-            $pattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route['pattern']);
-            $pattern = '#^' . $pattern . '$#';
+            $pattern = preg_replace("/\{[^}]+\}/", "([^/]+)", $route["pattern"]);
+            $pattern = "#^" . $pattern . "$#";
 
             // Check if the current URI matches this pattern
             if (preg_match($pattern, $this->uri, $matches)) {
@@ -93,14 +103,14 @@ class Router
                 $params = array_slice($matches, 1);
 
                 // Instantiate the controller, passing in the database connection
-                [$class, $method] = $route['handler'];
-                $class = 'App\Controllers\\'.$class;
+                [$class, $method] = $route["handler"];
+                $class = "App\Controllers\\".$class;
 
                 try
                 {
                     // Check if route is protected and check auth if it is
                     // If route is protected and user isn't logged in,
-                    // auth middlewar will throw a httpexception
+                    // auth middleware will throw a httpexception
                     if ($route["protected"])
                     {
                         $middleware = new AuthMiddleware($this->tokenService);
@@ -114,7 +124,6 @@ class Router
                     }
 
                     // AuthController needs TokenService - other controllers don't
-                    // This is the simplest approach without a full DI container
                     $controller = $class === AuthController::class
                         ? new $class($this->database, $this->cache, $this->tokenService)
                         : new $class($this->database, $this->cache);
@@ -133,14 +142,14 @@ class Router
                 catch (HttpException $e)
                 {
                     // A known, intentional error - send the message and httpCode back
-                    $this->sendResponse(new Response(['error' => $e->getMessage()], $e->httpCode));
+                    $this->sendResponse(new Response(["error" => $e->getMessage()], $e->httpCode));
                 }
                 catch (\Throwable $e)
                 {
                     // Something unexpected went wrong - log it but don't expose
                     // internal details to the client
-                    error_log('Unhandled error: ' . $e->getMessage());
-                    $this->sendResponse(new Response(['error' => 'Internal server error', 'message' => $e->getMessage()], 500));
+                    error_log("Unhandled error: " . $e->getMessage());
+                    $this->sendResponse(new Response(["error" => "Internal server error", "message" => $e->getMessage()], 500));
                 }
 
                 // Handle the return value and send the response
@@ -150,7 +159,7 @@ class Router
         }
 
         // No route matched
-        $this->sendResponse(new Response(['error' => 'Not found'], 404));
+        $this->sendResponse(new Response(["error" => "Not found"], 404));
     }
 
     // Accepts either a Response object and outputs the JSON to the client

@@ -33,17 +33,17 @@ class Migrator
     // Reverse the most recently applied migration
     public function reverse(): void
     {
-        $lastMigration = $this->database->query("
+        $lastMigration = $this->database->queryOne("
             SELECT migration_name FROM migrations ORDER BY created DESC LIMIT 1
         ");
 
-        if (empty($lastMigration))
+        if ($lastMigration === false)
         {
             echo "No migrations applied to reverse.".PHP_EOL;
             return;
         }
 
-        $this->runMigrationDown($lastMigration[0]["migration_name"]);
+        $this->runMigrationDown($lastMigration["migration_name"]);
     }
 
     // Rollback all applied migrations
@@ -123,7 +123,7 @@ class Migrator
     private function runMigrationDown(string $migrationFileName): void
     {
         // Get migration name and object
-        $migrationFilePath = __DIR__.'/migrations/'.$migrationFileName;
+        $migrationFilePath = __DIR__."/migrations/".$migrationFileName;
         $migration = $this->loadMigration($migrationFilePath);
 
         echo "Rolling back migration: {$migrationFileName}".PHP_EOL;

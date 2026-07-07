@@ -24,42 +24,38 @@ class AuthController extends BaseController
     // POST /api/auth/login
     public function login(): Response
     {
-        $body = $this->getJsonBody(['email', 'password']);
+        $body = $this->getJsonBody(["email", "password"]);
 
         // Look up the user by email
-        $users = $this->database->query(
-            'SELECT id, first_name, last_name, email, password FROM users WHERE email = :email',
-            ['email' => $body['email']]
+        $user = $this->database->queryOne(
+            "SELECT id, first_name, last_name, email, password FROM users WHERE email = :email LIMIT 1",
+            ["email" => $body["email"]]
         );
 
-        // password_verify() handles the bcrypt comparison safely
-        // We check both in the same condition to avoid leaking whether
+        // Check both requirements in the same condition to avoid leaking whether
         // the email exists via a timing difference in the response
-        if (empty($users) || !password_verify($body['password'], $users[0]['password'])) {
-            throw new HttpException('Invalid email or password', 401);
+        if ($user === false || !password_verify($body["password"], $user["password"])) {
+            throw new HttpException("Invalid email or password", 401);
         }
 
-        $user  = $users[0];
-        $token = $this->tokenService->generate($user['id']);
+        $token = $this->tokenService->generate($user["id"]);
 
         // Set the token as an httpOnly cookie
-        // httpOnly means JavaScript cannot read it - only the browser sends it automatically
         // samesite=Strict prevents the cookie being sent on cross-site requests (CSRF protection)
-        setcookie('auth_token', $token, [
+        setcookie("auth_token", $token, [
             "expires" => time() + 3600,
-            "path" => '/',
+            "path" => "/",
             "secure" => false,
             "httponly" => true,
-            "samesite" => 'Strict'
+            "samesite" => "Strict"
         ]);
 
-        // Return the user data but not the token - the client doesn't need it
-        // since the browser handles the cookie automatically
+        // Return the user data without the password field
         return $this->respond([
-            'id'    => $user['id'],
-            'first_name'  => $user['first_name'],
-            'last_name'  => $user['last_name'],
-            'email' => $user['email'],
+            "id"    => $user["id"],
+            "first_name"  => $user["first_name"],
+            "last_name"  => $user["last_name"],
+            "email" => $user["email"],
         ]);
     }
 
@@ -67,15 +63,21 @@ class AuthController extends BaseController
     public function logout(): Response
     {
         // Overwrite the cookie with an expired one to delete it from the browser
-        setcookie('auth_token', '', [
+        setcookie("auth_token", "", [
             "expires" => time() - 3600,
-            "path" => '/',
+            "path" => "/",
             "secure" => false,
             "httponly" => true,
-            "samesite" => 'Strict'
+            "samesite" => "Strict"
         ]);
 
-        return $this->respond(['message' => 'Logged out successfully']);
+        return $this->respond([], 204);
+    }
+
+    public function register(): Response
+    {
+        $userController = new UserController($this->database, $this->cache);
+        return $userController->add();
     }
 
     // GET /api/auth/authUser
@@ -84,15 +86,15 @@ class AuthController extends BaseController
     public function authUser(): Response
     {
         // AuthMiddleware has already validated the token and set the user ID
-        $users = $this->database->query(
-            'SELECT id, first_name, last_name, email FROM users WHERE id = :id',
-            ['id' => AuthMiddleware::$userId]
+        $user = $this->database->queryOne(
+            "SELECT id, first_name, last_name, email FROM users WHERE id = :id LIMIT 1",
+            ["id" => AuthMiddleware::$userId]
         );
 
-        if (empty($users)) {
-            throw new HttpException('User not found', 404);
+        if ($user === false) {
+            throw new HttpException("User not found", 404);
         }
 
-        return $this->respond($users[0]);
+        return $this->respond($user);
     }
 }

@@ -19,10 +19,10 @@ class AuthMiddleware
     public function checkAuth(): void
     {
         // The cookie name we'll set on login
-        $token = $_COOKIE['auth_token'] ?? null;
+        $token = $_COOKIE["auth_token"] ?? null;
 
         if ($token === null) {
-            throw new HttpException('Authentication required', 401);
+            throw new HttpException("Authentication required", 401);
         }
 
         // validate() throws an HttpException if anything is wrong with the token

@@ -29,15 +29,15 @@ $tokenService = new TokenService($_ENV["JWT_SECRET"]);
 // Create the cache connection here, to be used globally throughout the API
 // If the cache is unavailable, the API can still function without it
 $cache = new Cache(
-    host: $_ENV['REDIS_HOST'],
-    port: (int)$_ENV['REDIS_PORT'],
+    host: $_ENV["REDIS_HOST"],
+    port: (int)$_ENV["REDIS_PORT"],
 );
 
 // --- API Routing ---
 
 // Get the request method (GET, POST, etc.) and the URL path
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$method = $_SERVER["REQUEST_METHOD"];
+$uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 // Create the router and register your routes
 $router = new Router(
@@ -49,7 +49,7 @@ $router = new Router(
 );
 
 // Load route definitions from config file
-require_once __DIR__ . '/../routes.php';
+require_once __DIR__ . "/../routes.php";
 
 // Dispatch - match the current request to a route and run the controller
 $router->dispatch();
