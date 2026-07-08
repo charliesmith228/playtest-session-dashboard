@@ -15,10 +15,10 @@ return function (Database $database)
         {
             $this->database->execute("
                 CREATE TABLE playtest_notes (
-                    ID SERIAL PRIMARY KEY,
-                    playtestID SERIAL REFERENCES playtests (ID),
+                    id SERIAL NOT NULL PRIMARY KEY,
+                    playtest_id SERIAL NOT NULL REFERENCES playtests(ID) ON DELETE CASCADE,
                     notes TEXT NOT NULL,
-                    created_by SERIAL REFERENCES users (ID),
+                    created_by SERIAL NOT NULL REFERENCES users(ID) ON DELETE CASCADE,
                     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
                     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
                 )

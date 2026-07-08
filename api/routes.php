@@ -21,6 +21,13 @@ $router->post("/api/users", ["UserController", "add"], protected: true);
 $router->put("/api/users", ["UserController", "edit"], protected: true);
 $router->delete("/api/users", ["UserController", "delete"], protected: true);
 
+// Video games routes - private, tokens required
+$router->get("/api/video_games", ["VideoGameController", "index"], protected: true);
+$router->get("/api/video_games/{id}", ["VideoGameController", "show"], protected: true);
+$router->post("/api/video_games", ["VideoGameController", "add"], protected: true);
+$router->put("/api/video_games", ["VideoGameController", "edit"], protected: true);
+$router->delete("/api/video_games", ["VideoGameController", "delete"], protected: true);
+
 // Playtests routes - private, tokens required
 $router->get("/api/playtests", ["PlaytestController", "index"], protected: true);
 $router->get("/api/playtests/{id}", ["PlaytestController", "show"], protected: true);

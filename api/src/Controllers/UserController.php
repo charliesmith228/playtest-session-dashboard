@@ -68,7 +68,8 @@ class UserController extends BaseController
             "first_name",
             "last_name",
             "email",
-            "password"
+            "password",
+            "playtester_focus"
         ]);
 
         $body["password"] = password_hash($body["password"], PASSWORD_BCRYPT);
@@ -79,12 +80,14 @@ class UserController extends BaseController
                 first_name,
                 last_name,
                 email,
-                password
+                password,
+                playtester_focus
             ) VALUES (
                 :first_name,
                 :last_name,
                 :email,
-                :password
+                :password,
+                :playtester_focus
             )",
             $body
         );
@@ -120,7 +123,8 @@ class UserController extends BaseController
             "id",
             "first_name",
             "last_name",
-            "email"
+            "email",
+            "playtester_focus"
         ]);
 
         // Retrieve user record by ID to check if exists
@@ -139,6 +143,7 @@ class UserController extends BaseController
                 first_name = :first_name,
                 last_name = :last_name,
                 email = :email,
+                playtester_focus = :playtester_focus,
                 updated_at = NOW()
             WHERE ID = :id",
             $body
