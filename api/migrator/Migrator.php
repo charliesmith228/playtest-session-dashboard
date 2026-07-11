@@ -90,9 +90,7 @@ class Migrator
         $appliedMigrationsFileNames = array_column($appliedMigrations, "migration_name");
 
         //Return only those that have not been applied (i.e. pending)
-        return array_filter($migrationFiles, static function (string $migrationFile) use ($appliedMigrationsFileNames) {
-            return !\in_array(basename($migrationFile), $appliedMigrationsFileNames, strict: true);
-        });
+        return array_filter($migrationFiles, static fn(string $migrationFile) => !\in_array(basename($migrationFile), $appliedMigrationsFileNames, strict: true));
     }
 
     // Load migration class and run the up method
