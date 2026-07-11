@@ -22,16 +22,15 @@ class Router
         private string $uri,
         private Database $database,
         private Cache $cache,
-        private TokenService $tokenService
-    ){}
+        private TokenService $tokenService,
+    ) {}
 
     // Register a GET route
     public function get(
         string $pattern,
         array $handler,
-        bool $protected = false
-    ): void
-    {
+        bool $protected = false,
+    ): void {
         $this->addRoute("GET", $pattern, $handler, $protected);
     }
 
@@ -39,9 +38,8 @@ class Router
     public function post(
         string $pattern,
         array $handler,
-        bool $protected = false
-    ): void
-    {
+        bool $protected = false,
+    ): void {
         $this->addRoute("POST", $pattern, $handler, $protected);
     }
 
@@ -49,9 +47,8 @@ class Router
     public function put(
         string $pattern,
         array $handler,
-        bool $protected = false
-    ): void
-    {
+        bool $protected = false,
+    ): void {
         $this->addRoute("PUT", $pattern, $handler, $protected);
     }
 
@@ -59,9 +56,8 @@ class Router
     public function delete(
         string $pattern,
         array $handler,
-        bool $protected = false
-    ): void
-    {
+        bool $protected = false,
+    ): void {
         $this->addRoute("DELETE", $pattern, $handler, $protected);
     }
 
@@ -69,22 +65,20 @@ class Router
         string $method,
         string $pattern,
         array $handler,
-        bool $protected
-    ): void
-    {
+        bool $protected,
+    ): void {
         $this->routes[] = [
             "method"  => $method,
             "pattern" => $pattern,
             "handler" => $handler,
-            "protected" => $protected
+            "protected" => $protected,
         ];
     }
 
     // Process current request to find a match in registered routes
     public function dispatch(): void
     {
-        foreach ($this->routes as $route)
-        {
+        foreach ($this->routes as $route) {
             // Skip if the HTTP method doesn't match (e.g. GET vs POST)
             if ($route["method"] !== $this->method) {
                 continue;
@@ -100,26 +94,23 @@ class Router
 
                 // $matches[0] is the full match, so remove it
                 // The remaining values are the captured URL parameters
-                $params = array_slice($matches, 1);
+                $params = \array_slice($matches, 1);
 
                 // Instantiate the controller, passing in the database connection
                 [$class, $method] = $route["handler"];
-                $class = "App\Controllers\\".$class;
+                $class = "App\Controllers\\" . $class;
 
-                try
-                {
+                try {
                     // Check if route is protected and check auth if it is
                     // If route is protected and user isn't logged in,
                     // auth middleware will throw a httpexception
-                    if ($route["protected"])
-                    {
+                    if ($route["protected"]) {
                         $middleware = new AuthMiddleware($this->tokenService);
                         $middleware->checkAuth();
                     }
 
                     // Check the class exists before trying to instantiate it
-                    if (!class_exists($class))
-                    {
+                    if (!class_exists($class)) {
                         throw new \RuntimeException("Controller class '{$class}' not found");
                     }
 
@@ -130,22 +121,17 @@ class Router
 
 
                     // Check the method in the class exists before trying to run it
-                    if (!method_exists($class, $method))
-                    {
+                    if (!method_exists($class, $method)) {
                         throw new \RuntimeException("Method '{$method}' for class '{$class}' not found");
                     }
 
                     // Call the controller method and capture whatever it returns
                     $result = $controller->$method(...$params);
                     $this->sendResponse($result);
-                }
-                catch (HttpException $e)
-                {
+                } catch (HttpException $e) {
                     // A known, intentional error - send the message and httpCode back
                     $this->sendResponse(new Response(["error" => $e->getMessage()], $e->httpCode));
-                }
-                catch (\Throwable $e)
-                {
+                } catch (\Throwable $e) {
                     // Something unexpected went wrong - log it but don't expose
                     // internal details to the client
                     error_log("Unhandled error: " . $e->getMessage());

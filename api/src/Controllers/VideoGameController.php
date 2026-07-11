@@ -23,7 +23,7 @@ class VideoGameController extends BaseController
 
         // Get all video games from db
         $videoGames = $this->database->query(
-            "SELECT id, game_name, platforms, build FROM video_games"
+            "SELECT id, game_name, platforms, build FROM video_games",
         );
 
         // Store in cache for 1 hour, then return
@@ -46,7 +46,7 @@ class VideoGameController extends BaseController
         // Get video game from db where ID = provided parameter
         $videoGame = $this->database->queryOne(
             "SELECT id, game_name, platforms, build FROM video_games WHERE ID = :id LIMIT 1",
-            ["video_game_id" => $id]
+            ["video_game_id" => $id],
         );
 
         if ($videoGame === false) {
@@ -68,7 +68,7 @@ class VideoGameController extends BaseController
         $body = $this->getJsonBody([
             "game_name",
             "platforms",
-            "build"
+            "build",
         ]);
 
         $body["created_by"] = AuthMiddleware::$userId;
@@ -86,7 +86,7 @@ class VideoGameController extends BaseController
                 :build,
                 :created_by
             )",
-            $body
+            $body,
         );
 
         // Check if insert was successful
@@ -101,7 +101,7 @@ class VideoGameController extends BaseController
             "id"    => $newVideoGameID,
             "game_name" => $body["game_name"],
             "platforms" => $body["platforms"],
-            "build" => $body["build"]
+            "build" => $body["build"],
         ];
 
         // Add new video game to the cache
@@ -120,13 +120,13 @@ class VideoGameController extends BaseController
             "id",
             "game_name",
             "platforms",
-            "build"
+            "build",
         ]);
 
         // Retrieve video game record by ID to check if exists
         $videoGame = $this->database->queryOne(
             "SELECT ID FROM video_games WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($videoGame === false) {
@@ -141,7 +141,7 @@ class VideoGameController extends BaseController
                 build = :build,
                 updated_at = NOW()
             WHERE ID = :id",
-            $body
+            $body,
         );
 
         // Check if update was successful
@@ -153,7 +153,7 @@ class VideoGameController extends BaseController
             "id" => $body["id"],
             "game_name" => $body["game_name"],
             "platforms" => $body["platforms"],
-            "build" => $body["build"]
+            "build" => $body["build"],
         ];
 
         // If updated, update cache
@@ -173,7 +173,7 @@ class VideoGameController extends BaseController
         // Retrieve video game record by ID to check if exists
         $videoGame = $this->database->queryOne(
             "SELECT ID FROM video_games WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($videoGame === false) {
@@ -183,7 +183,7 @@ class VideoGameController extends BaseController
         // Remove video game from db and cache
         $this->database->execute(
             "DELETE FROM video_games WHERE ID = :id",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         $this->cache->forget("video_games:index:{$body["id"]}");

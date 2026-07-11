@@ -23,7 +23,7 @@ class PlaytestController extends BaseController
 
         // Get all playtests from db
         $playtests = $this->database->query(
-            "SELECT id, game_name, playtest_description, start_time, end_time FROM playtests"
+            "SELECT id, game_name, playtest_description, start_time, end_time FROM playtests",
         );
 
         // Store in cache for 1 hour, then return
@@ -46,7 +46,7 @@ class PlaytestController extends BaseController
         // Get playtest from db where ID = provided parameter
         $playtest = $this->database->queryOne(
             "SELECT id, game_name, playtest_description, start_time, end_time FROM playtests WHERE ID = :id LIMIT 1",
-            ["playtest_id" => $id]
+            ["playtest_id" => $id],
         );
 
         if ($playtest === false) {
@@ -69,7 +69,7 @@ class PlaytestController extends BaseController
             "game_name",
             "playtest_description",
             "start_time",
-            "end_time"
+            "end_time",
         ]);
 
         $body["created_by"] = AuthMiddleware::$userId;
@@ -89,7 +89,7 @@ class PlaytestController extends BaseController
                 :end_time,
                 :created_by
             )",
-            $body
+            $body,
         );
 
         // Check if insert was successful
@@ -125,13 +125,13 @@ class PlaytestController extends BaseController
             "game_name",
             "playtest_description",
             "start_time",
-            "end_time"
+            "end_time",
         ]);
 
         // Retrieve playtest record by ID to check if exists
         $playtest = $this->database->queryOne(
             "SELECT ID FROM playtests WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($playtest === false) {
@@ -147,7 +147,7 @@ class PlaytestController extends BaseController
                 end_time = :end_time,
                 updated_at = NOW()
             WHERE ID = :id",
-            $body
+            $body,
         );
 
         // Check if update was successful
@@ -180,7 +180,7 @@ class PlaytestController extends BaseController
         // Retrieve playtest record by ID to check if exists
         $playtest = $this->database->queryOne(
             "SELECT ID FROM playtests WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($playtest === false) {
@@ -190,7 +190,7 @@ class PlaytestController extends BaseController
         // Remove playtest from db and cache
         $this->database->execute(
             "DELETE FROM playtests WHERE ID = :id",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         $this->cache->forget("playtests:index:{$body["id"]}");

@@ -7,7 +7,7 @@ declare(strict_types=1);
 // after the router has been instantiated.
 
 // Auth routes - public, no token required
-$router->post("/api/auth/login",  ["AuthController", "login"]);
+$router->post("/api/auth/login", ["AuthController", "login"]);
 $router->post("/api/auth/logout", ["AuthController", "logout"]);
 $router->post("/api/auth/register", ["AuthController", "register"]);
 

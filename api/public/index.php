@@ -16,10 +16,10 @@ use App\Services\TokenService;
 // Connects early to catch any db errors before running any functionality
 $database = new Database(
     host: $_ENV["DB_HOST"],
-    port: (int)$_ENV["DB_PORT"],
+    port: (int) $_ENV["DB_PORT"],
     name: $_ENV["DB_NAME"],
     user: $_ENV["DB_USER"],
-    password: $_ENV["DB_PASS"]
+    password: $_ENV["DB_PASS"],
 );
 
 // Create the token service here, to be used globally throughout the API
@@ -30,7 +30,7 @@ $tokenService = new TokenService($_ENV["JWT_SECRET"]);
 // If the cache is unavailable, the API can still function without it
 $cache = new Cache(
     host: $_ENV["REDIS_HOST"],
-    port: (int)$_ENV["REDIS_PORT"],
+    port: (int) $_ENV["REDIS_PORT"],
 );
 
 // --- API Routing ---
@@ -45,7 +45,7 @@ $router = new Router(
     $uri,
     $database,
     $cache,
-    $tokenService
+    $tokenService,
 );
 
 // Load route definitions from config file

@@ -29,7 +29,7 @@ class AuthController extends BaseController
         // Look up the user by email
         $user = $this->database->queryOne(
             "SELECT id, first_name, last_name, email, password FROM users WHERE email = :email LIMIT 1",
-            ["email" => $body["email"]]
+            ["email" => $body["email"]],
         );
 
         // Check both requirements in the same condition to avoid leaking whether
@@ -47,7 +47,7 @@ class AuthController extends BaseController
             "path" => "/",
             "secure" => false,
             "httponly" => true,
-            "samesite" => "Strict"
+            "samesite" => "Strict",
         ]);
 
         // Return the user data without the password field
@@ -68,7 +68,7 @@ class AuthController extends BaseController
             "path" => "/",
             "secure" => false,
             "httponly" => true,
-            "samesite" => "Strict"
+            "samesite" => "Strict",
         ]);
 
         return $this->respond([], 204);
@@ -88,7 +88,7 @@ class AuthController extends BaseController
         // AuthMiddleware has already validated the token and set the user ID
         $user = $this->database->queryOne(
             "SELECT id, first_name, last_name, email FROM users WHERE id = :id LIMIT 1",
-            ["id" => AuthMiddleware::$userId]
+            ["id" => AuthMiddleware::$userId],
         );
 
         if ($user === false) {

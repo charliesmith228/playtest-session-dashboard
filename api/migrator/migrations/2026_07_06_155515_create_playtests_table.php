@@ -7,10 +7,8 @@ namespace App\Migrator\Migrations;
 use App\Database;
 use App\Migrator\Migration;
 
-return function (Database $database)
-{
-    return new class($database) extends Migration
-    {
+return static function (Database $database) {
+    return new class ($database) extends Migration {
         public function up(): void
         {
             $this->database->execute("

@@ -12,5 +12,5 @@ class Response
 
         // HTTP status code - defaults to 200 OK
         public readonly int $status = 200,
-    ){}
+    ) {}
 }

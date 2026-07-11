@@ -12,10 +12,10 @@ use App\Migrator\Migrator;
 // Any error are caught before running migration functionality
 $database = new Database(
     host: $_ENV["DB_HOST"],
-    port: (int)$_ENV["DB_PORT"],
+    port: (int) $_ENV["DB_PORT"],
     name: $_ENV["DB_NAME"],
     user: $_ENV["DB_USER"],
-    password: $_ENV["DB_PASS"]
+    password: $_ENV["DB_PASS"],
 );
 
 $migrator = new Migrator($database);
@@ -30,5 +30,5 @@ match ($command) {
     "migrate" => $migrator->migrate(),
     "reverse" => $migrator->reverse(),
     "rollback" => $migrator->rollback(),
-    default => "Unknown command '{$command}'.".PHP_EOL."Commands: migrate, reverse, rollback".PHP_EOL
+    default => "Unknown command '{$command}'." . PHP_EOL . "Commands: migrate, reverse, rollback" . PHP_EOL,
 };

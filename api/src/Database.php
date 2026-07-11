@@ -17,11 +17,9 @@ class Database
         int $port,
         string $name,
         string $user,
-        string $password
-    )
-    {
-        try
-        {
+        string $password,
+    ) {
+        try {
             // Data Source Name - the connection string
             $dsn = "pgsql:host={$host};port={$port};dbname={$name}";
 
@@ -35,11 +33,9 @@ class Database
 
                     // Return rows as associative arrays by default
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                ]
+                ],
             );
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             // Don't expose the real error to the client - log it instead
             error_log("Database connection failed: " . $e->getMessage());
             http_response_code(500);

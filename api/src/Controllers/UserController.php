@@ -22,7 +22,7 @@ class UserController extends BaseController
 
         // Get all users from db
         $users = $this->database->query(
-            "SELECT id, first_name, last_name, email FROM users"
+            "SELECT id, first_name, last_name, email FROM users",
         );
 
         // Store in cache for 1 hour, then return
@@ -45,7 +45,7 @@ class UserController extends BaseController
         // Get user from db where ID = provided parameter
         $user = $this->database->queryOne(
             "SELECT id, first_name, last_name, email FROM users WHERE ID = :id LIMIT 1",
-            ["id" => $id]
+            ["id" => $id],
         );
 
         if ($user === false) {
@@ -69,7 +69,7 @@ class UserController extends BaseController
             "last_name",
             "email",
             "password",
-            "playtester_focus"
+            "playtester_focus",
         ]);
 
         $body["password"] = password_hash($body["password"], PASSWORD_BCRYPT);
@@ -89,7 +89,7 @@ class UserController extends BaseController
                 :password,
                 :playtester_focus
             )",
-            $body
+            $body,
         );
 
         // Check if insert was successful
@@ -124,13 +124,13 @@ class UserController extends BaseController
             "first_name",
             "last_name",
             "email",
-            "playtester_focus"
+            "playtester_focus",
         ]);
 
         // Retrieve user record by ID to check if exists
         $user = $this->database->queryOne(
             "SELECT ID FROM users WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($user === false) {
@@ -146,7 +146,7 @@ class UserController extends BaseController
                 playtester_focus = :playtester_focus,
                 updated_at = NOW()
             WHERE ID = :id",
-            $body
+            $body,
         );
 
         // Check if update was successful
@@ -178,7 +178,7 @@ class UserController extends BaseController
         // Retrieve user record by ID to check if exists
         $user = $this->database->queryOne(
             "SELECT ID FROM users WHERE ID = :id LIMIT 1",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         if ($user === false) {
@@ -188,7 +188,7 @@ class UserController extends BaseController
         // Remove user from db and cache
         $this->database->execute(
             "DELETE FROM users WHERE ID = :id",
-            ["id" => $body["id"]]
+            ["id" => $body["id"]],
         );
 
         $this->cache->forget("users:index:{$body["id"]}");

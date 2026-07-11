@@ -13,8 +13,8 @@ abstract class BaseController
 {
     public function __construct(
         protected Database $database,
-        protected Cache $cache
-    ){
+        protected Cache $cache,
+    ) {
         // Set the Content-Type header once for all API responses
         header("Content-Type: application/json");
     }

@@ -13,13 +13,10 @@ class Cache
 
     public function __construct(string $host, int $port)
     {
-        try
-        {
+        try {
             $this->redis = new Redis();
             $this->redis->connect($host, $port);
-        }
-        catch (RedisException $e)
-        {
+        } catch (RedisException $e) {
             error_log("Redis connection failed: " . $e->getMessage());
             // If Redis is unavailable, continue without caching
         }
@@ -31,8 +28,7 @@ class Cache
     {
         $value = $this->redis->get($key);
 
-        if ($value === false)
-        {
+        if ($value === false) {
             return null;
         }
 
@@ -59,8 +55,7 @@ class Cache
     {
         $keys = $this->redis->keys($pattern);
 
-        if (!empty($keys))
-        {
+        if (!empty($keys)) {
             $this->redis->del($keys);
         }
     }

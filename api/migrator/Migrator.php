@@ -8,7 +8,8 @@ use App\Database;
 
 class Migrator
 {
-    public function __construct(protected Database $database) {
+    public function __construct(protected Database $database)
+    {
         // Alway check this on object instantiation
         $this->checkMigrationsTableExists();
     }
@@ -18,14 +19,12 @@ class Migrator
     {
         $pendingMigrations = $this->getPendingMigrations();
 
-        if (empty($pendingMigrations))
-        {
-            echo "Migrations up to date.".PHP_EOL;
+        if (empty($pendingMigrations)) {
+            echo "Migrations up to date." . PHP_EOL;
             return;
         }
 
-        foreach ($pendingMigrations as $pendingMigrations)
-        {
+        foreach ($pendingMigrations as $pendingMigrations) {
             $this->runMigrationUp($pendingMigrations);
         }
     }
@@ -37,9 +36,8 @@ class Migrator
             SELECT migration_name FROM migrations ORDER BY created DESC LIMIT 1
         ");
 
-        if ($lastMigration === false)
-        {
-            echo "No migrations applied to reverse.".PHP_EOL;
+        if ($lastMigration === false) {
+            echo "No migrations applied to reverse." . PHP_EOL;
             return;
         }
 
@@ -50,17 +48,15 @@ class Migrator
     public function rollback(): void
     {
         $appliedMigrations = $this->database->query(
-            "SELECT migration_name FROM migrations ORDER BY created desc"
+            "SELECT migration_name FROM migrations ORDER BY created desc",
         );
 
-        if (empty($appliedMigrations))
-        {
-            echo "No migrations applied to roll back.".PHP_EOL;
+        if (empty($appliedMigrations)) {
+            echo "No migrations applied to roll back." . PHP_EOL;
             return;
         }
 
-        foreach ($appliedMigrations as $appliedMigration)
-        {
+        foreach ($appliedMigrations as $appliedMigration) {
             $this->runMigrationDown($appliedMigration["migration_name"]);
         }
     }
@@ -85,7 +81,7 @@ class Migrator
     private function getPendingMigrations(): array
     {
         // Get all migrations from the migrations directory
-        $migrationFiles = glob(__DIR__."/migrations/*.php");
+        $migrationFiles = glob(__DIR__ . "/migrations/*.php");
         // Sort alphanumerically to ensure migrations are in chronological order
         sort($migrationFiles);
 
@@ -94,8 +90,8 @@ class Migrator
         $appliedMigrationsFileNames = array_column($appliedMigrations, "migration_name");
 
         //Return only those that have not been applied (i.e. pending)
-        return array_filter($migrationFiles, function(string $migrationFile) use ($appliedMigrationsFileNames){
-            return !in_array(basename($migrationFile), $appliedMigrationsFileNames, strict: true);
+        return array_filter($migrationFiles, static function (string $migrationFile) use ($appliedMigrationsFileNames) {
+            return !\in_array(basename($migrationFile), $appliedMigrationsFileNames, strict: true);
         });
     }
 
@@ -106,37 +102,37 @@ class Migrator
         $migrationFileName = basename($migrationFilePath);
         $migration = $this->loadMigration($migrationFilePath);
 
-        echo "Running migration: {$migrationFileName}".PHP_EOL;
+        echo "Running migration: {$migrationFileName}" . PHP_EOL;
 
         $migration->up();
 
         // Record successful migration so that it is skipped on next run
         $this->database->execute(
             "INSERT INTO migrations (migration_name) VALUES (:migration_name)",
-            ["migration_name" => $migrationFileName]
+            ["migration_name" => $migrationFileName],
         );
 
-        echo "Migration complete: {$migrationFileName}".PHP_EOL;
+        echo "Migration complete: {$migrationFileName}" . PHP_EOL;
     }
 
     // Load migration class and run the down method
     private function runMigrationDown(string $migrationFileName): void
     {
         // Get migration name and object
-        $migrationFilePath = __DIR__."/migrations/".$migrationFileName;
+        $migrationFilePath = __DIR__ . "/migrations/" . $migrationFileName;
         $migration = $this->loadMigration($migrationFilePath);
 
-        echo "Rolling back migration: {$migrationFileName}".PHP_EOL;
+        echo "Rolling back migration: {$migrationFileName}" . PHP_EOL;
 
         $migration->down();
 
         // Record successful roll back so that migration will be included in next up() call
         $this->database->execute(
             "DELETE FROM migrations WHERE migration_name = :migration_name",
-            ["migration_name" => $migrationFileName]
+            ["migration_name" => $migrationFileName],
         );
 
-        echo "Migration roll back complete: {$migrationFileName}".PHP_EOL;
+        echo "Migration roll back complete: {$migrationFileName}" . PHP_EOL;
     }
 
     //Method to get the anonymous migration class from the file

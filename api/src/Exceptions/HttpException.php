@@ -12,8 +12,7 @@ class HttpException extends RuntimeException
         string $message,
         // The HTTP status code to send back to the client
         public readonly int $httpCode = 400,
-    )
-    {
+    ) {
         parent::__construct($message);
     }
 }
