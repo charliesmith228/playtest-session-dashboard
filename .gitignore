@@ -10,7 +10,7 @@ vendor/
 node_modules/
 
 # React build output - generated via npm run build
-frontend/dist/
+ui/dist/
 
 # OS junk
 .DS_Store
